@@ -1,0 +1,31 @@
+name: 'Deploy to AWS CloudFormation'
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code from main branch
+        uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.ACCESS_KEY}}
+          aws-secret-access-key: ${{secret.ACCESS_KEY_SECRET}}
+          aws-region: us-east-1
+
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: aws-cicd-stack
+          template: bucket.yml
+          no-fail-on-empty-changeset: "1"
+          parameter-overrides: "EC2InstanceType=t2.micro" 
+      
